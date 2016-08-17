@@ -2,10 +2,12 @@ var qs = require('querystring');
 var express = require('express');
 var AWS = require('aws-sdk');
 var dotenv = require('dotenv');
+var instruction = require('./instruction.js'); 
 
 var snsClient;
 var router = express.Router();
 var app = express();
+
 
 // Load my environment variables
 dotenv.load();
@@ -101,6 +103,8 @@ function main()
     app.listen(3000);
     
     console.log('listening on PORT 3000');
+
+    var grocery = new instruction(); 
 }
 
 main();

@@ -19,6 +19,19 @@ dotenv.load();
 // get the kms slack token
 var kmsEncyptedToken = process.env.KMSENCRYPTEDTOKEN
 
+// Call backs
+function __startListening (err, data)
+{
+    if (err) {
+        console.log("Decrypt error: " + err);
+    } else
+        this.token = data.Plaintext.toString('ascii');
+
+    bot = controller.spawn({
+        token: this.token
+    }).startRTM();
+}
+
 // Publish the message that Nayya recieves to the topic
 function publishMsgToTopic (message, topicID) {
         var paramsMessage = {
@@ -31,18 +44,6 @@ function publishMsgToTopic (message, topicID) {
             if(err) console.log(err, err.stack);
             else    console.log(data);
         });
-}
-
-function __startListening (err, data)
-{
-    if (err) {
-        console.log("Decrypt error: " + err);
-    } else
-        this.token = data.Plaintext.toString('ascii');
-
-    bot = controller.spawn({
-        token: this.token
-    }).startRTM();
 }
 
 function decryptKMS(callback) {

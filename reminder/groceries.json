@@ -1,0 +1,23 @@
+{
+    "default" : "ask",
+    "ask" : {
+        "type" : ["ask", "question"],
+        "what" : ["any groceries you'll need to buy today?"],
+        "when" : ["daily", "morning"],
+        "who" : "my family",
+        "rules" : ["remind"]
+    },
+    "remind" : {
+        "type" : ["reminder", "question"],
+        "what" : ["hv you bought the groceries"],
+        "when" : ["rule", "askWhenToRemind"],
+        "who" : "my family"
+    },
+    "askWhenToRemind" : {
+        "type" : ["ask", "question"],
+        "what" : ["when do you want me to remind you?", "at a specific time,", "in 1 hr", "or after work?"],
+        "when" : [],
+        "who" : "my family",
+        "rules" : ["remind"]
+    }
+}
