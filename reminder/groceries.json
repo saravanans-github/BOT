@@ -1,6 +1,5 @@
 {
-    "default" : "ask",
-    "ask" : {
+    "default" : {
         "type" : ["ask", "question"],
         "what" : ["any groceries you'll need to buy today?"],
         "when" : ["daily", "morning"],

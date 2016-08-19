@@ -20,9 +20,71 @@
 
 var src;
 
+function compileWhen()
+{
+
+}
+
+function compileWho()
+{
+
+}
+
+function compileRules()
+{
+
+}
+
 function rule(src)
 {
     this.src = src;
+    var what = '';
+    var when = {
+        time: new Date(),
+        freq: 0
+    };
+
+    compileWhat = function() {
+        if(src.what[0] == 'rule')
+            ; // then it is a rule
+        else
+            what = src.what[0];
+    }
+
+    compileWhen = function() {
+    if(src.when[0] == 'rule')
+        ; // then it is a rule
+    else
+    {
+        // get the repeat frequency
+        if(src.when[0] == 'daily')
+        {
+            when.freq = (24*60*60); // every 24 hrs
+        }
+
+        // get when in a day
+        if(src.when[1] == 'morning')
+        {
+            // gimme an approximate time between 7-9am
+            when.time.setHours(Math.floor(Math.random()*(9-7+1)+7));
+            when.time.setMinutes(Math.floor(Math.random()*(60-0+1)+0));
+        }
+        else if(src.when[1] == 'evening')
+        {
+            // gimme an approximate time between 5-9pm (i.e 17 - 21 hrs)
+            when.time.setHours(Math.floor(Math.random()*(21-17+1)+17));
+            when.time.setMinutes(Math.floor(Math.random()*(60-0+1)+0));
+        }
+    }
+}
+
+    this.getWhat = function () { return what; }
+    this.getWhen = function () { return when; }
+
+    compileWhat();
+    compileWhen();
+
+    return this;
 }
 
 module.exports = rule;

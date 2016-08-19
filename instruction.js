@@ -19,42 +19,56 @@
     // the rules will be executed sequentially after the current rule is executed
 
 var fs = require('fs');
+var rule = require('./rule.js');
 
 var instructionObject;
+var ruleAtHead = 0;
+var rules = [];
 
-function compileInstruction()
+instruction.prototype.compile = function()
 {
-
+    // loop thru all the rules and compile them
+    for(var item in instructionObject)
+    {
+        rules.push(new rule(instructionObject[item]));
+    }
 }
 
-function parseInstruction(filename)
+instruction.prototype.load = function(filename, __callback)
 {
     // Read from the file
     fs.readFile(filename, (err, data) => {
     if (err) throw err;
 
     // Call the callback
-    __parseInstruction(data)
+    __load(data, __callback);
     });
 }
 
-function __parseInstruction(data)
+function __load(data, __callback)
 {
     // Clear the object
     instructionObject = null;
 
     try {
-        instructionObject = JSON.parse(data); 
+        instructionObject = JSON.parse(data);
     } catch (err) {
         console.log(err, err.stack);
         return;
     }
+
+    typeof (__callback) == 'function' ? __callback() : true;
 }
 
 function instruction()
 {
     // Load the instruction
-    parseInstruction('reminder/groceries.json');
+    this.load('reminder/groceries.json', this.compile);
+
 }
+
+// Unit Testing
+//instruction();
+var instruct = new instruction();
 
 module.exports = instruction;
