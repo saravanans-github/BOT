@@ -20,18 +20,75 @@
 
 var fs = require('fs');
 var rule = require('./rule.js');
+var schedule = require('node-schedule');
+
 
 var instructionObject;
 var ruleAtHead = 0;
-var rules = [];
+var rulesOnMainThread = {};
+var rulesOnRefThread = {};
+var __onComplete;
+var scheduledJob;
+
+var runRule = function()
+{
+    var keys = Object.keys(rulesOnMainThread),
+    length = keys.length,
+    i = ruleAtHead,
+    prop,
+    value;
+
+    var message = {
+        username : "nayya", 
+        channel : '',
+        text : '',
+        runNow : true
+    };
+
+//    while (i < length) {
+
+        prop = keys[i];
+        if(rulesOnMainThread[prop].what.isRule)
+            ;// call the Rule
+        else
+            message.text = rulesOnMainThread[prop].what.toAsk;
+
+        if(rulesOnMainThread[prop].when.isRule)
+            ;// call the Rule
+        else
+            ; //message.text = rulesOnMainThread[prop].what.toAsk;
+        
+        if(rulesOnMainThread[prop].who.isRule)
+            ;// call the Rule
+        else
+            message.channel = rulesOnMainThread[prop].who.toAsk;
+
+        scheduledJob = schedule.scheduleJob(rulesOnMainThread[prop].when.toRecur, function() {
+            var string = '{"username" : "nayya", "channel" : "' + message.channel + '", "text" : "' + message.text + '"}';
+            console.log(string);
+        });
+
+//         i++;
+//     }
+}
 
 instruction.prototype.compile = function()
-{
-    // loop thru all the rules and compile them
-    for(var item in instructionObject)
+{       
+    // Main Thread - loop thru all the rules and compile them
+    for(var item in instructionObject.mainThread)
     {
-        rules.push(new rule(instructionObject[item]));
+        console.log('compiling ' + item);
+        rulesOnMainThread[item] = new rule(instructionObject.mainThread[item]);
     }
+
+    //  Ref Thread - loop thru all the rules and compile them
+    for(var item in instructionObject.refThread)
+    {
+        console.log('compiling ' + item);
+        rulesOnRefThread[item] = new rule(instructionObject.refThread[item]);
+    }
+
+    runRules();
 }
 
 instruction.prototype.load = function(filename, __callback)
@@ -60,11 +117,11 @@ function __load(data, __callback)
     typeof (__callback) == 'function' ? __callback() : true;
 }
 
-function instruction()
+function instruction(instructionFile)
 {
     // Load the instruction
+    this.__onComplete = this.run;
     this.load('reminder/groceries.json', this.compile);
-
 }
 
 // Unit Testing

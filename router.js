@@ -104,7 +104,7 @@ function main()
     
     console.log('listening on PORT 3000');
 
-    var grocery = new instruction(); 
+    var grocery = new instruction('reminder/groceries.json'); 
 }
 
 main();
