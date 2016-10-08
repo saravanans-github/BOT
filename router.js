@@ -31,7 +31,7 @@ router.use(function timestamplog(req, res, next) {
 
 // Process the POST request to processMsg
 //router.post('/processMsg', __processMessage) ;
-router.post('/getAnswer', __getAnswer);
+router.post('/questions/getgrocerylist', __getAnswer);
 
 function __getAnswer (req, res)
 {
@@ -53,7 +53,7 @@ function __getAnswer (req, res)
         try {
             jsonPayload = JSON.parse(body);
             console.log('payload ' + jsonPayload.rule);
-            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end();
 
             // Ask Nayya to ask the questions
@@ -62,8 +62,9 @@ function __getAnswer (req, res)
         } catch (err) {
             console.log(err, err.stack);
             // Request not JSON formatted. 
-            // Tell SNS that we got a bad request as the  
-            res.writeHead(400, {'Content-Type': 'text/plain'});
+            // Respond that we got a bad request as the  
+            res.writeHead(400, {'Content-Type': 'application/json'});
+            res.write('{"error": "Request not JSON formated"}');
             res.end();
         }
     })
