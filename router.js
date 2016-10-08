@@ -2,7 +2,7 @@ var qs = require('querystring');
 var express = require('express');
 var AWS = require('aws-sdk');
 var dotenv = require('dotenv');
-var instruction = require('./instruction.js'); 
+var nayya = require('./nayya.js'); 
 
 var snsClient;
 var router = express.Router();
@@ -30,9 +30,11 @@ router.use(function timestamplog(req, res, next) {
 });
 
 // Process the POST request to processMsg
-router.post('/processMsg', __processMessage) ;
+//router.post('/processMsg', __processMessage) ;
+router.post('/getAnswer', __getAnswer);
 
-function __processMessage (req, res){
+function __getAnswer (req, res)
+{
     var body = '';
 
     // process the POST data
@@ -45,11 +47,18 @@ function __processMessage (req, res){
             req.connection.destroy();
     });
 
-    req.on('end', function () {
+        req.on('end', function () {
         var jsonPayload;
         
         try {
-            jsonPayload = JSON.parse(body); 
+            jsonPayload = JSON.parse(body);
+            console.log('payload ' + jsonPayload.rule);
+            res.writeHead(200, {'Content-Type': 'text/plain'});
+            res.end();
+
+            // Ask Nayya to ask the questions
+            new nayya(jsonPayload.rule);
+
         } catch (err) {
             console.log(err, err.stack);
             // Request not JSON formatted. 
@@ -57,45 +66,75 @@ function __processMessage (req, res){
             res.writeHead(400, {'Content-Type': 'text/plain'});
             res.end();
         }
-
-        // This is to allow the HTTP endpoint to subscribe for to the SNS Topic
-        if (jsonPayload.Type == 'SubscriptionConfirmation')
-        {
-            console.log(body);
-            var snsClient = new AWS.SNS(AWS.credentials);
-            var params = {
-            "Token" : json.Token,
-            "TopicArn" : json.TopicArn
-            };
-            console.log('Subscribed to Notication ' + snsClient.confirmSubscription(params, function(err, data){
-                if(err) console.log(err, err.stack);
-                else    console.log(data);
-            }));
-        }
-        // All other messages come here
-        else if(jsonPayload.Type = 'Notification')
-        {
-            var jsonMessage;
-
-            try {
-                jsonMessage = JSON.parse(jsonPayload.Message); 
-            } catch (err) {
-                console.log(err, err.stack);
-                return;
-            }
-
-            var message = '{"username" : "nayya", "channel" : "' + jsonMessage.channel + '", "text" : "' + jsonMessage.text + '"}';
-            console.log('Notified: ' + message);            
-            
-            var request = require('request');
-            request.post(process.env.WEBHOOK_REMINDER).form({payload:message});
-
-            // Tell SNS that we got the msg loud and clear
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.end('Ok');
-        }
-    });
+    })
 }
+
+/********** Deprecated *************************/
+// This is where the subscription to SNS happens
+// function __processMessage (req, res){
+//     var body = '';
+
+//     // process the POST data
+//     req.on('data', function (data) {
+//         body += data;
+
+//         // Too much POST data, kill the connection!
+//         // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+//         if (body.length > 1e6)
+//             req.connection.destroy();
+//     });
+
+//     req.on('end', function () {
+//         var jsonPayload;
+        
+//         try {
+//             jsonPayload = JSON.parse(body); 
+//         } catch (err) {
+//             console.log(err, err.stack);
+//             // Request not JSON formatted. 
+//             // Tell SNS that we got a bad request as the  
+//             res.writeHead(400, {'Content-Type': 'text/plain'});
+//             res.end();
+//         }
+
+//         // This is to allow the HTTP endpoint to subscribe for to the SNS Topic
+//         if (jsonPayload.Type == 'SubscriptionConfirmation')
+//         {
+//             console.log(body);
+//             var snsClient = new AWS.SNS(AWS.credentials);
+//             var params = {
+//             "Token" : json.Token,
+//             "TopicArn" : json.TopicArn
+//             };
+//             console.log('Subscribed to Notication ' + snsClient.confirmSubscription(params, function(err, data){
+//                 if(err) console.log(err, err.stack);
+//                 else    console.log(data);
+//             }));
+//         }
+//         // All other messages come here
+//         else if(jsonPayload.Type = 'Notification')
+//         {
+//             var jsonMessage;
+
+//             try {
+//                 jsonMessage = JSON.parse(jsonPayload.Message); 
+//             } catch (err) {
+//                 console.log(err, err.stack);
+//                 return;
+//             }
+
+//             var message = '{"username" : "nayya", "channel" : "' + jsonMessage.channel + '", "text" : "' + jsonMessage.text + '"}';
+//             console.log('Notified: ' + message);            
+            
+//             var request = require('request');
+//             request.post(process.env.WEBHOOK_REMINDER).form({payload:message});
+
+//             // Tell SNS that we got the msg loud and clear
+//             res.writeHead(200, {'Content-Type': 'text/plain'});
+//             res.end('Ok');
+//         }
+//     });
+// }
 
 function main()
 {
@@ -103,8 +142,6 @@ function main()
     app.listen(3000);
     
     console.log('listening on PORT 3000');
-
-    var grocery = new instruction('reminder/groceries.json'); 
 }
 
 main();
