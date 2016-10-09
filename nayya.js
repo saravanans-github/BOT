@@ -27,7 +27,7 @@ var __startConversation = function (err, data)
     if (err) {
         console.log("Decrypt error: " + err);
     } else
-        this.token = data.Plaintext.toString('ascii');
+        this.token = data;//.Plaintext.toString('ascii');
 
    var bot = controller.spawn({
         token: this.token
@@ -89,7 +89,9 @@ function nayya(rule)
     cRule = rule;
 
     // decrypt the slack bot key and get the Answer
-    decryptKMS(__startConversation);
+    //decryptKMS(__startConversation);
+    console.log('token: ' + process.env.SLACKAPITOKEN);
+    __startConversation(null, process.env.SLACKAPITOKEN)
 }
 
 module.exports = nayya;
