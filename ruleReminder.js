@@ -10,7 +10,7 @@ var RuleReminder =
     {
         var response;
         var params = {
-            TableName: (byActive)? REMINDER_TABLE_NAME : ACTIVE_REMINDER_TABLE_NAME, /* required */
+            TableName: ((byActive)? ACTIVE_REMINDER_TABLE_NAME : REMINDER_TABLE_NAME), /* required */
             Select: 'ALL_ATTRIBUTES',
             KeyConditionExpression: 'ownerId = :byOwnerId',
             FilterExpression: 'active = :active',
