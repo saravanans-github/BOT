@@ -1,6 +1,6 @@
 var Promise = require('promise');
 var AWS = require('aws-sdk');
-var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1', endpoint:"http://localhost:8000"});
+var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1' /*, endpoint:"http://localhost:8000"*/});
 
 var RuleReminder =
 {
@@ -17,8 +17,6 @@ var RuleReminder =
                 ":active": {"BOOL": byActive}
             },
         };
-
-        console.log(params);
 
         var request = dynamodb.query(params);
         var promise = request.promise();
