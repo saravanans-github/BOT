@@ -1,7 +1,6 @@
 var Promise = require('promise');
 var AWS = require('aws-sdk');
 var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1' /*, endpoint:"http://localhost:8000"*/});
-const ACTIVE_REMINDER_TABLE_NAME = 'ActiveReminders';
 const REMINDER_TABLE_NAME = 'Reminders';
 
 var RuleReminder =
@@ -10,7 +9,7 @@ var RuleReminder =
     {
         var response;
         var params = {
-            TableName: ((byActive)? ACTIVE_REMINDER_TABLE_NAME : REMINDER_TABLE_NAME), /* required */
+            TableName: REMINDER_TABLE_NAME, /* required */
             Select: 'ALL_ATTRIBUTES',
             KeyConditionExpression: 'ownerId = :byOwnerId',
             FilterExpression: 'active = :active',
@@ -40,7 +39,7 @@ var RuleReminder =
     {
         var response;
         var params = {
-            TableName: 'Reminders', /* required */
+            TableName: REMINDER_TABLE_NAME, /* required */
             Select: 'ALL_ATTRIBUTES',
             KeyConditionExpression: 'ownerId = :byOwnerId',
             FilterExpression: 'active = :active',
