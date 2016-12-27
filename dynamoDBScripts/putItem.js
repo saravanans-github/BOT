@@ -1,7 +1,7 @@
 var params = {
     'Item': {
         'ownerId': {'S': 'C3K03U7B5'},
-        'title': {'S': 'Abhi swimming lesson'},
+        'title': {'S': 'Abhi piano lesson'},
         'active': {'BOOL': false},
         'who': {'M': {
             'remind': {'SS': ['U1M8BBPD1']}
@@ -9,7 +9,7 @@ var params = {
             // 'tag':{'M': {}}
         }},
         'what': {'M': {
-            'description': {'S': "Abhi's piano lesson is tomorrow @ 7.30pm"}
+            'description': {'S': "Abhi's piano is tomorrow @ 7.30pm"}
             // 'tag': {'M': {}}
         }},
         'when': {'M': {

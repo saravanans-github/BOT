@@ -61,7 +61,7 @@ function __getReminders (req, res, next){
             reminders[i] = reminder;
         }
 
-        var response = { channel: req.query.byOwnerId, items: reminders};
+        var response = { channel: req.query.byOwnerId, count: reminders.length, items: reminders};
 
 
         res.set('Content-Type', 'application/json');
