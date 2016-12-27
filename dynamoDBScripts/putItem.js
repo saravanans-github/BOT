@@ -1,7 +1,7 @@
 var params = {
     'Item': {
-        'ownerId': {'S': 'U1M8BBPD1'},
-        'title': {'S': 'Abhi piano lesson'},
+        'ownerId': {'S': 'C3K03U7B5'},
+        'title': {'S': 'Abhi swimming lesson'},
         'active': {'BOOL': false},
         'who': {'M': {
             'remind': {'SS': ['U1M8BBPD1']}
@@ -9,7 +9,7 @@ var params = {
             // 'tag':{'M': {}}
         }},
         'what': {'M': {
-            'description': {'S': "Abhi's piano lesson is tomorrow."}
+            'description': {'S': "Abhi's piano lesson is tomorrow @ 7.30pm"}
             // 'tag': {'M': {}}
         }},
         'when': {'M': {
@@ -20,7 +20,7 @@ var params = {
         }}
     },
     'TableName': 'Reminders',
-    'ReturnConsumedCapacity': 'INDEXES | TOTAL | NONE',
+    'ReturnConsumedCapacity': 'TOTAL',
     'ReturnValues': 'ALL_OLD'
 };
 
@@ -31,7 +31,7 @@ AWS.config.update({
     region:'ap-southeast-1'
 });
 
-var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1', endpoint:"http://localhost:8000"});
+var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1' /*, endpoint:"http://localhost:8000"*/});
 dynamodb.putItem(params, function(err, data){
   if (err) console.log(err, err.stack); // an error occurred
   else     console.log(data);           // successful response
