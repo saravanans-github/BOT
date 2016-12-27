@@ -3,10 +3,15 @@ var express = require('express');
 var AWS = require('aws-sdk');
 var dotenv = require('dotenv');
 var nayya = require('./nayya.js'); 
+var ruleReminder = require('./ruleReminder.js');
+var Promise = require('promise');
+
 
 var snsClient;
 var router = express.Router();
 var app = express();
+
+
 
 
 // Load my environment variables
@@ -25,15 +30,91 @@ AWS.config.apiVersions = {
 
 // Log every request that comes in to our Middleware
 router.use(function timestamplog(req, res, next) {
-    console.log('MW incoming. %s @ %dt', req.url, Date.now());
+    console.log('MW incoming. %s @ %d', req.url, Date.now());
     next();
 });
 
 // Process the POST request to processMsg
 //router.post('/processMsg', __processMessage) ;
-router.post('/questions/getgrocerylist', __getAnswer);
+//router.post('/reminder/send', __sendReminders);
+router.get('/reminder/get', __getReminders);
+router.post('/reminder/update', __updateReminders);
+router.post('/remind', __sendReminders);
 
-function __getAnswer (req, res)
+
+function __getReminders (req, res, next){
+    "use strict";    
+
+    ruleReminder.getReminders(  req.query.byOwnerId, 
+                                req.query.byActive.localeCompare("false") ? true : false, 
+                                function(err, data){  // respond w/ 200
+
+        // re-format data
+        var reminders = [];
+
+        for(var i=0; i<data.Items.length; i++)
+        {
+            var reminder = ruleReminder.reminder;
+            reminder.who.remind = data.Items[i].who.M.remind.SS;
+            reminder.what.description = data.Items[i].what.M.description.S;
+            reminder.when.due = Number(data.Items[i].when.M.due.S);
+            reminders[i] = reminder;
+        }
+
+        var response = { channel: req.query.byOwnerId, items: reminders};
+
+
+        res.set('Content-Type', 'application/json');
+        res.status(200);
+        res.json(response).send();
+    });
+}
+
+function __updateReminders (req, res, next){
+    "use strict";
+
+    var body = ''; 
+
+    // process the POST data
+    req.on('data', function (data) {
+        body += data;
+
+        // Too much POST data, kill the connection!
+        // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+        if (body.length > 1e6)
+            req.connection.destroy();
+    });
+
+        req.on('end', function () {
+        var jsonPayload;
+        
+        try {
+            jsonPayload = JSON.parse(body);
+
+            //TODO:
+            // 1. Get the in-active Reminders by iD
+
+            ruleReminder.updateActiveReminders(jsonPayload.byOwnerId, function(err, data){
+                // respond w/ 200
+
+                res.set('Content-Type', 'application/json');
+                res.status(200);
+                res.json(data).send();
+            });
+        } catch (err) {
+            console.log(err, err.stack);
+
+            // Request not JSON formatted. 
+            // Respond that we got a bad request as the  
+            res.set('Content-Type', 'application/json');
+            res.status(400);
+            res.json({"status": "ERROR", "exception": "request not JSON formated"}).send();
+        }
+    })
+}
+
+
+function __sendReminders (req, res)
 {
     var body = '';
 
@@ -52,20 +133,23 @@ function __getAnswer (req, res)
         
         try {
             jsonPayload = JSON.parse(body);
-            console.log('payload ' + jsonPayload.rule);
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end();
+
+            // 3. Tell Nayya to remind on slack abt the active reminders
+            res.set('Content-Type', 'application/json');
+            res.status(200);
+            res.json({"status": "OK"}).send();
 
             // Ask Nayya to ask the questions
-            new nayya(jsonPayload.rule);
+            new nayya(jsonPayload.rule, jsonPayload.data);
 
         } catch (err) {
             console.log(err, err.stack);
+
             // Request not JSON formatted. 
             // Respond that we got a bad request as the  
-            res.writeHead(400, {'Content-Type': 'application/json'});
-            res.write('{"error": "Request not JSON formated"}');
-            res.end();
+            res.set('Content-Type', 'application/json');
+            res.status(400);
+            res.json({"status": "ERROR", "exception": "request not JSON formated"}).send();
         }
     })
 }
@@ -140,6 +224,7 @@ function __getAnswer (req, res)
 function main()
 {
     app.post('*', router);
+    app.get('*', router);
     app.listen(3000);
     
     console.log('listening on PORT 3000');

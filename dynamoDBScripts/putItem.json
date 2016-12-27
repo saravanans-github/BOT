@@ -1,0 +1,10 @@
+{
+    "UserId": {"S": "U1M8BBPD1"},
+    "What": {"S": "Pay SingTel Bill"},
+    "When": {"M": { 
+        "period": {"S": "month"},
+        "day": {"S":"28"}
+        }
+    },
+    "Why": {"S": "###RESERVED###"}
+}

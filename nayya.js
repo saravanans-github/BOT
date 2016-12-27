@@ -3,12 +3,15 @@ var Botkit = require('botkit');
 var os = require('os');
 var AWS = require('aws-sdk');
 var getGroceryList = require('./conversations/getGroceryList.js');
+var tellActiveReminders = require('./conversations/tellActiveReminders');
+
 
 var controller = Botkit.slackbot({
     debug: false
 });
 
 var cRule = '';
+var cData = null;
 
 // Ensure that the region is correct
 AWS.config.update({
@@ -36,11 +39,11 @@ var __startConversation = function (err, data)
     bot.startRTM();
     
     controller.on(['rtm_open'], function(bot, message) {
-            message = {channel:'D1M9KQWTG', user:'U1M8BBPD1', text:''};
-
             console.log('firing up the convo for rule: ' + cRule);
-            RULE_TO_CONVO_MAP[cRule](bot, message);
+            new RULE_TO_CONVO_MAP[cRule](bot, message, cData);
     });
+
+    //TODO: add a listener to listen for follow up actions
 }
 
 /********************* DEPRECATED ************************************/ 
@@ -77,16 +80,26 @@ var __getGroceryList = function(bot, message)
     new getGroceryList(bot, message);
 } 
 
+var __tellActiveReminders = function(bot, message, data)
+{
+    new tellActiveReminders(bot, message,data);
+} 
+
+
 // do a map of the convos to the rules
 var RULE_TO_CONVO_MAP = {
     // Rule        : Callback
-    GetGroceryList : __getGroceryList
+    GetGroceryList : __getGroceryList,
+    TellActiveReminders : tellActiveReminders
 }
 
-function nayya(rule)
+function nayya(rule, data)
 {
     // Get the name of the rule
     cRule = rule;
+
+    // Store any data to be handled
+    cData = data;
 
     // decrypt the slack bot key and get the Answer
     //decryptKMS(__startConversation);

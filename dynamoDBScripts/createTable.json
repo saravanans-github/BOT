@@ -1,0 +1,19 @@
+{
+   "AttributeDefinitions": [ 
+      { 
+         "AttributeName": "UserId",
+         "AttributeType": "S"
+      }
+   ],
+   "KeySchema": [ 
+      { 
+         "AttributeName": "UserId",
+         "KeyType": "HASH"
+      }
+   ],
+   "ProvisionedThroughput": { 
+      "ReadCapacityUnits": 1,
+      "WriteCapacityUnits": 1
+   },
+   "TableName": "Reminders"
+}
