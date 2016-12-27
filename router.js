@@ -223,8 +223,9 @@ function __sendReminders (req, res)
 
 function main()
 {
-    app.post('*', router);
-    app.get('*', router);
+    app.post('/reminder', router);
+    app.get('/reminder', router);
+    app.post('/remind', router);
     app.listen(3000);
     
     console.log('listening on PORT 3000');
