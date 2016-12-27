@@ -54,7 +54,7 @@ function __getReminders (req, res, next){
 
         for(var i=0; i<data.Items.length; i++)
         {
-            var reminder = ruleReminder.reminder;
+            var reminder = { who: { remind: [] }, what: { description: ""}, when: { due: 0 } };
             reminder.who.remind = data.Items[i].who.M.remind.SS;
             reminder.what.description = data.Items[i].what.M.description.S;
             reminder.when.due = Number(data.Items[i].when.M.due.S);
