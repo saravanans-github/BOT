@@ -54,14 +54,15 @@ function __getReminders (req, res, next){
 
         for(var i=0; i<data.Items.length; i++)
         {
-            var reminder = { who: { remind: [] }, what: { description: ""}, when: { due: 0 } };
+            var reminder = { who: { remind: [] }, what: { description: ""}, when: { due: 0 }
+};
             reminder.who.remind = data.Items[i].who.M.remind.SS;
             reminder.what.description = data.Items[i].what.M.description.S;
             reminder.when.due = Number(data.Items[i].when.M.due.S);
             reminders[i] = reminder;
         }
 
-        var response = { channel: req.query.byOwnerId, count: data.count, items: reminders};
+        var response = { channel: req.query.byOwnerId, count: reminders.length, items: reminders};
 
 
         res.set('Content-Type', 'application/json');
