@@ -37,7 +37,7 @@ router.use(function timestamplog(req, res, next) {
 //router.post('/reminder/send', __sendReminders);
 router.get('/reminder/get', __getReminders);
 router.post('/reminder/update', __updateReminders);
-router.post('/remind', __sendReminders);
+router.post('/reminder/send', __sendReminders);
 router.delete('/reminder/delete', __deleteReminders);
 
 
