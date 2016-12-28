@@ -12,8 +12,6 @@ var router = express.Router();
 var app = express();
 
 
-
-
 // Load my environment variables
 dotenv.load();
 
@@ -40,6 +38,7 @@ router.use(function timestamplog(req, res, next) {
 router.get('/reminder/get', __getReminders);
 router.post('/reminder/update', __updateReminders);
 router.post('/remind', __sendReminders);
+router.delete('/reminder/delete', __deleteReminders);
 
 
 function __getReminders (req, res, next){
@@ -54,8 +53,14 @@ function __getReminders (req, res, next){
 
         for(var i=0; i<data.Items.length; i++)
         {
-            var reminder = { who: { remind: [] }, what: { description: ""}, when: { due: 0 }
-};
+            var reminder = { who: { remind: [] }, what: { description: ""}, when: { due: 0 } };
+
+            // do not return the items if they have expired
+            // TODO: delete this item from the DB
+            if( data.Items[i].when.M.due.S &&
+                Date(data.Items[i].when.M.due.S) <= Date.now())
+                continue;
+
             reminder.who.remind = data.Items[i].who.M.remind.SS;
             reminder.what.description = data.Items[i].what.M.description.S;
             reminder.when.due = Number(data.Items[i].when.M.due.S);
@@ -114,8 +119,47 @@ function __updateReminders (req, res, next){
     })
 }
 
-
 function __sendReminders (req, res)
+{
+    var body = '';
+
+    // process the POST data
+    req.on('data', function (data) {
+        body += data;
+
+        // Too much POST data, kill the connection!
+        // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
+        if (body.length > 1e6)
+            req.connection.destroy();
+    });
+
+        req.on('end', function () {
+        var jsonPayload;
+        
+        try {
+            jsonPayload = JSON.parse(body);
+
+            // 3. Tell Nayya to remind on slack abt the active reminders
+            res.set('Content-Type', 'application/json');
+            res.status(200);
+            res.json({"status": "OK"}).send();
+
+            // Ask Nayya to ask the questions
+            new nayya(jsonPayload.rule, jsonPayload.data);
+
+        } catch (err) {
+            console.log(err, err.stack);
+
+            // Request not JSON formatted. 
+            // Respond that we got a bad request as the  
+            res.set('Content-Type', 'application/json');
+            res.status(400);
+            res.json({"status": "ERROR", "exception": "request not JSON formated"}).send();
+        }
+    })
+}
+
+function __deleteReminders (req, res)
 {
     var body = '';
 
