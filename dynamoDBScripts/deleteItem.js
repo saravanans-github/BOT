@@ -18,7 +18,7 @@ AWS.config.update({
     region:'ap-southeast-1'
 });
 
-var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1' /*, endpoint:"http://localhost:8000"*/});
+var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1', endpoint:"http://localhost:8000"});
 dynamodb.deleteItem(params, function(err, data){
   if (err) console.log(err, err.stack); // an error occurred
   else     console.log(data);           // successful response
