@@ -1,6 +1,6 @@
 var Promise = require('promise');
 var AWS = require('aws-sdk');
-var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1' /*, endpoint:"http://localhost:8000"*/});
+var dynamodb = new AWS.DynamoDB({region_name:'ap-southeast-1', endpoint:"http://localhost:8000"});
 const REMINDER_TABLE_NAME = 'Reminders';
 
 var RuleReminder =
@@ -83,7 +83,7 @@ var RuleReminder =
                             break;
                     }
 
-                    // we need to add this to the DB
+                    // we need to add this to the DB and respond success
                     if(currentItem.active.BOOL)
                     {
                         currentItem.title.S += '|ACTIVATED';
@@ -100,6 +100,8 @@ var RuleReminder =
                             else  callback(null, params);           // successful response
                             });
                     }
+                    else // return no items to update
+                        callback(null, {});
                 }
             },
             function(error) {
