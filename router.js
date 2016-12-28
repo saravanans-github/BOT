@@ -1,3 +1,4 @@
+var dotenv = require('dotenv');
 var qs = require('querystring');
 var express = require('express');
 var AWS = require('aws-sdk');
@@ -10,7 +11,6 @@ var Promise = require('promise');
 var snsClient;
 var router = express.Router();
 var app = express();
-
 
 // Load my environment variables
 dotenv.load();
