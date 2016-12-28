@@ -92,17 +92,14 @@ var RuleReminder =
                             'TableName': 'Reminders'
                         }
 
-                        console.log('new params');
-                        console.log(params);
-
                         dynamodb.putItem(params, function(err, data){
                             if (err) console.log(err, err.stack); // an error occurred
-                            else  callback(null, params);           // successful response
+                            else  console.log(data);           // successful response
                             });
                     }
-                    else // return no items to update
-                        callback(null, {});
                 }
+
+                callback(null, {status: "TODO: Add the updated items in the reponse"});
             },
             function(error) {
                 /* handle the error */
