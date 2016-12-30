@@ -50,6 +50,7 @@ function __getReminders (req, res, next){
 
         // re-format data
         var reminders = [];
+	var j = 0;
 
         for(var i=0; i<data.Items.length; i++)
         {
@@ -57,14 +58,14 @@ function __getReminders (req, res, next){
 
             // do not return the items if they have expired
             // TODO: delete this item from the DB
-            if( data.Items[i].when.M.due.S &&
-                Date(data.Items[i].when.M.due.S) <= Date.now())
+            if( data.Items[i].active.BOOL == true &&
+                (new Date(Number(data.Items[i].when.M.due.S))).getTime() <= Date.now())
                 continue;
 
             reminder.who.remind = data.Items[i].who.M.remind.SS;
             reminder.what.description = data.Items[i].what.M.description.S;
             reminder.when.due = Number(data.Items[i].when.M.due.S);
-            reminders[i] = reminder;
+            reminders[j++] = reminder;
         }
 
         var response = { channel: req.query.byOwnerId, count: reminders.length, items: reminders};
