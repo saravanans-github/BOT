@@ -1,7 +1,7 @@
 var params = {
     'Item': {
-        'ownerId': {'S': 'U1M8BBPD1'},
-        'title': {'S': 'Menaka law exam'},
+        'ownerId': {'S': 'G3Q8HS007'},
+        'title': {'S': 'Arjun  school uniform'},
         'active': {'BOOL': false},
         'who': {'M': {
             'remind': {'SS': ['U1M8BBPD1']}
@@ -9,13 +9,13 @@ var params = {
             // 'tag':{'M': {}}
         }},
         'what': {'M': {
-            'description': {'S': "Amma, your law exam is in Apr... Reminder. :)"}
+            'description': {'S': "FYR... ARJUN needs to wear his T-Shirt to school tomorrow morning."}
             // 'tag': {'M': {}}
         }},
         'when': {'M': {
-            'due': {'S': "0"},
+            'due': {'S': "2"},
             'period': {'S': 'week'},
-            'day': {'S':'4'}
+            'day': {'S':'2'}
             // 'tag':{'M': {}}
         }}
     },
