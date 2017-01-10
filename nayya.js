@@ -5,14 +5,6 @@ var AWS = require('aws-sdk');
 var getGroceryList = require('./conversations/getGroceryList.js');
 var tellActiveReminders = require('./conversations/tellActiveReminders');
 
-var controller = Botkit.slackbot({
-    debug: true
-});
-
-var bot = controller.spawn({
-        token: process.env.SLACKAPITOKEN
-});
-
 var cRule = '';
 var cData = null;
 
@@ -24,8 +16,15 @@ AWS.config.update({
 // Load my environment variables
 dotenv.load();
 
-// get the kms slack token
-var kmsEncyptedToken = process.env.KMSENCRYPTEDTOKEN
+// initiate controller and bot
+var controller = Botkit.slackbot({
+    debug: true
+});
+
+var bot = controller.spawn({
+        token: process.env.SLACKAPITOKEN
+});
+
 
 // Convo manager for getGroceryList
 var __startConversation = function (err, data)
