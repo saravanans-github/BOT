@@ -5,9 +5,12 @@ var AWS = require('aws-sdk');
 var getGroceryList = require('./conversations/getGroceryList.js');
 var tellActiveReminders = require('./conversations/tellActiveReminders');
 
-
 var controller = Botkit.slackbot({
-    debug: false
+    debug: true
+});
+
+var bot = controller.spawn({
+        token: process.env.SLACKAPITOKEN
 });
 
 var cRule = '';
@@ -27,17 +30,13 @@ var kmsEncyptedToken = process.env.KMSENCRYPTEDTOKEN
 // Convo manager for getGroceryList
 var __startConversation = function (err, data)
 {
-    if (err) {
-        console.log("Decrypt error: " + err);
-    } else
-        this.token = data;//.Plaintext.toString('ascii');
-
-   var bot = controller.spawn({
-        token: this.token
-    });
+    // if (err) {
+    //     console.log("Decrypt error: " + err);
+    // } else
+    //     this.token = data;//.Plaintext.toString('ascii');
     
     bot.startRTM();
-    
+
     controller.on(['rtm_open'], function(bot, message) {
             console.log('firing up the convo for rule: ' + cRule);
             new RULE_TO_CONVO_MAP[cRule](bot, message, cData);
