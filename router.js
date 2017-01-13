@@ -92,7 +92,6 @@ function __getReminders (req, res, next){
 
         var response = { channel: req.query.byOwnerId, count: reminders.length, items: reminders};
 
-
         res.set('Content-Type', 'application/json');
         res.status(200);
         res.json(response).send();
@@ -162,11 +161,6 @@ function __sendReminders (req, res)
         try {
             jsonPayload = JSON.parse(body);
 
-            // 3. Tell Nayya to remind on slack abt the active reminders
-            res.set('Content-Type', 'application/json');
-            res.status(200);
-            res.json({"status": "OK"}).send();
-
             // Ask Nayya to ask the based on the rule
             bot.startRTM();
 
@@ -174,6 +168,11 @@ function __sendReminders (req, res)
                 console.log('firing up rule: ' + jsonPayload.rule);
                 new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
             });
+
+            // 3. Tell Nayya to remind on slack abt the active reminders
+            res.set('Content-Type', 'application/json');
+            res.status(200);
+            res.json({"status": "OK"}).send();
 
             // console.log('firing up rule: ' + jsonPayload.rule);
             // new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
