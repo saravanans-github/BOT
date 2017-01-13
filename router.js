@@ -1,10 +1,19 @@
+var AWS = require('aws-sdk');
+
+// Ensure that the region is correct. 
+// IMPT -   THIS HAS TO HAPPEN IMMEDIATELY AFTER AWS IS INIT SO THAT
+//          ALL CLASSES CAN INHERIT THIS CONFIG
+AWS.config.update({
+    region:'ap-southeast-1'
+});
+
+
 var dotenv = require('dotenv');
 var qs = require('querystring');
 var express = require('express');
 var Botkit = require('botkit');
-var AWS = require('aws-sdk');
 var ruleReminder = require('./ruleReminder.js');
-var Promise = require('promise');
+
 
 // conversations
 var tellActiveReminders = require('./conversations/tellActiveReminders');
@@ -40,11 +49,6 @@ var bot = controller.spawn({
         token: process.env.SLACKAPITOKEN
 });
 /*------------------------------------------------------------------------------*/
-
-// Ensure that the region is correct
-AWS.config.update({
-    region:'ap-southeast-1'
-});
 
 // Log every request that comes in to our Middleware
 /*------------------------------------------------------------------------------*/
