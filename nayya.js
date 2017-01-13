@@ -16,16 +16,6 @@ AWS.config.update({
 // Load my environment variables
 dotenv.load();
 
-// initiate controller and bot
-var controller = Botkit.slackbot({
-    debug: true
-});
-
-var bot = controller.spawn({
-        token: process.env.SLACKAPITOKEN
-});
-
-
 // Convo manager for getGroceryList
 var __startConversation = function (err, data)
 {

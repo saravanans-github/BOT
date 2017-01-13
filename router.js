@@ -1,36 +1,58 @@
 var dotenv = require('dotenv');
 var qs = require('querystring');
 var express = require('express');
+var Botkit = require('botkit');
 var AWS = require('aws-sdk');
-var dotenv = require('dotenv');
-var nayya = require('./nayya.js'); 
 var ruleReminder = require('./ruleReminder.js');
 var Promise = require('promise');
 
-
-var snsClient;
-var router = express.Router();
-var app = express();
+// conversations
+var tellActiveReminders = require('./conversations/tellActiveReminders');
 
 // Load my environment variables
 dotenv.load();
+
+// Load the server and router
+/*------------------------------------------------------------------------------*/
+var router = express.Router();
+var app = express();
+/*------------------------------------------------------------------------------*/
+
+// do a map of the convos to the rules
+var RULE_TO_CONVO_MAP = {
+    // Rule        : Callback
+    GetGroceryList      : function(bot, message){
+                            new getGroceryList(bot, message);
+                            },
+    TellActiveReminders : function(bot, message, data){
+                            new tellActiveReminders(bot, message,data);
+                            } 
+}
+
+
+// initiate controller and bot
+/*------------------------------------------------------------------------------*/
+var controller = Botkit.slackbot({
+    debug: true
+});
+
+var bot = controller.spawn({
+        token: process.env.SLACKAPITOKEN
+});
+/*------------------------------------------------------------------------------*/
 
 // Ensure that the region is correct
 AWS.config.update({
     region:'ap-southeast-1'
 });
 
-// Set the API version for SNS
-AWS.config.apiVersions = {
-  sns: '2010-03-31',
-  // other service API versions
-};
-
 // Log every request that comes in to our Middleware
+/*------------------------------------------------------------------------------*/
 router.use(function timestamplog(req, res, next) {
     console.log('MW incoming. %s @ %d', req.url, Date.now());
     next();
 });
+/*------------------------------------------------------------------------------*/
 
 // Process the POST request to processMsg
 //router.post('/processMsg', __processMessage) ;
@@ -145,9 +167,16 @@ function __sendReminders (req, res)
             res.status(200);
             res.json({"status": "OK"}).send();
 
-            // Ask Nayya to ask the questions
-            new nayya(jsonPayload.rule, jsonPayload.data);
+            // Ask Nayya to ask the based on the rule
+            bot.startRTM();
 
+            controller.on(['rtm_open'], function(bot, message) {
+                console.log('firing up rule: ' + jsonPayload.rule);
+                new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
+            });
+
+            // console.log('firing up rule: ' + jsonPayload.rule);
+            // new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
         } catch (err) {
             console.log(err, err.stack);
 
@@ -272,8 +301,14 @@ function main()
     app.post('*', router);
     app.get('*', router);
     app.listen(3000);
-    
     console.log('listening on PORT 3000');
+
+    console.log('Nayya ready');
+
+    // controller.on(['rtm_open'], function(bot, message) {
+    //         console.log('firing up the convo for rule: ' + cRule);
+    //         new RULE_TO_CONVO_MAP[cRule](bot, message, cData);
+    // });
 }
 
 main();

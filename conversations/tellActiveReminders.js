@@ -1,4 +1,4 @@
-    function tellActiveReminders(bot, message, data)
+    function tellActiveReminders(bot, data)
     {
         var reminders = data.items;
         var message = {channel:data.channel, text:''};
