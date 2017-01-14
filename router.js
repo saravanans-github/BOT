@@ -42,7 +42,8 @@ var RULE_TO_CONVO_MAP = {
 // initiate controller and bot
 /*------------------------------------------------------------------------------*/
 var controller = Botkit.slackbot({
-    debug: true
+    debug: true,
+    require_delivery: true
 });
 
 var bot = controller.spawn({
