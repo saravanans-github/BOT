@@ -166,13 +166,15 @@ function __sendReminders (req, res)
         try {
             jsonPayload = JSON.parse(body);
 
-            // Ask Nayya to ask the based on the rule
-            bot.startRTM();
+            console.log('firing up rule: ' + jsonPayload.rule);
+            new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
 
-            controller.on(['rtm_open'], function(bot, message) {
-                console.log('firing up rule: ' + jsonPayload.rule);
-                new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
-            });
+            // Ask Nayya to ask the based on the rule
+        //    controller.on(['rtm_open'], function(lBot, message) {
+        //         console.log('RTM Open');      
+        //         console.log('firing up rule: ' + jsonPayload.rule);
+        //         new RULE_TO_CONVO_MAP[jsonPayload.rule](bot, jsonPayload.data);
+        //    });
 
             // 3. Tell Nayya to remind on slack abt the active reminders
             res.set('Content-Type', 'application/json');
@@ -307,12 +309,16 @@ function main()
     app.listen(3000);
     console.log('listening on PORT 3000');
 
-    console.log('Nayya ready');
+    bot.startRTM();
 
-    // controller.on(['rtm_open'], function(bot, message) {
-    //         console.log('firing up the convo for rule: ' + cRule);
-    //         new RULE_TO_CONVO_MAP[cRule](bot, message, cData);
-    // });
+    controller.on(['rtm_open'], function(bot, message) {
+            console.log('RTM Opened. Nayya ready');
+    });
+
+    controller.on(['rtm_close'], function(bot, message) {
+            console.log('RTM Closed');
+    });
+
 }
 
 main();

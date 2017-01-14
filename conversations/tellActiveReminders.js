@@ -3,6 +3,7 @@
         var reminders = data.items;
         var message = {channel:data.channel, text:''};
 
+        console.log('here\'s what i\'m going to remind...');
         console.log(reminders);
 
         if(reminders.length == 0)
@@ -17,8 +18,7 @@
             message.text = reminders[i].what.description;
             bot.say(message);
         }
-
-        bot.closeRTM();
+//       bot.closeRTM();
     }
 
     module.exports = tellActiveReminders;
