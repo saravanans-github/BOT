@@ -81,6 +81,18 @@ var RuleReminder =
                                 console.log(currentItem.active.BOOL);
                             }
                             break;
+                    case "month":
+                        if((Number(currentItem.when.M.day.S) - currentDateTime.getDate()) == 1) // if it is 1 day before
+                        {
+                            // update the value of when this reminder is due
+                            var tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            currentItem.when.M.due.S = tomorrow.getTime().toString(); // the due date
+                            currentItem.active.BOOL = true;
+                            console.log('is Active? ');
+                            console.log(currentItem.active.BOOL);
+                        }
+                        break;                            
                     }
 
                     // we need to add this to the DB and respond success
