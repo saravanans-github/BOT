@@ -1,7 +1,7 @@
 var Botkit = require('botkit');
 
 Nayya.DONE = ['(done)','(paid)','(settled)','(setled)'];
-Nayya.MOTIVATION = ['(worse)', '(bad)'];
+Nayya.MOTIVATION = ['(worse)', '(bad)', '(shit)'];
 
 Nayya.MOTIVATIONS = ['Don\t worry. Things hv been worse in the past... Cheer up.', 
                      'The night is darkest before dawn... Good times are comming.',
