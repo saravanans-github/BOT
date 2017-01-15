@@ -11,7 +11,7 @@ var dotenv = require('dotenv');
 var qs = require('querystring');
 var express = require('express');
 var Botkit = require('botkit');
-var Nayya = require('./Nayya.js');
+var Nayya = require('./nayya.js');
 var ruleReminder = require('./ruleReminder.js');
 
 // conversations
