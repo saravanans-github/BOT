@@ -7,16 +7,16 @@ AWS.config.update({
     region:'ap-southeast-1'
 });
 
-
 var dotenv = require('dotenv');
 var qs = require('querystring');
 var express = require('express');
 var Botkit = require('botkit');
+var Nayya = require('./Nayya.js');
 var ruleReminder = require('./ruleReminder.js');
-
 
 // conversations
 var tellActiveReminders = require('./conversations/tellActiveReminders');
+var nayya = new Nayya();
 
 // Load my environment variables
 dotenv.load();
@@ -49,6 +49,7 @@ var controller = Botkit.slackbot({
 var bot = controller.spawn({
         token: process.env.SLACKAPITOKEN
 });
+
 /*------------------------------------------------------------------------------*/
 
 // Log every request that comes in to our Middleware
@@ -319,6 +320,15 @@ function main()
             console.log('RTM Closed');
     });
 
+        controller.hears(Nayya.DONE,['direct_message,direct_mention'],function(bot,message) {
+            // do something to respond to message
+            nayya.reply(message,'You used a keyword!');
+        });
+
+            controller.hears(Nayya.MOTIVATION,['ambient'],function(bot,message) {
+            // do something to respond to message
+            nayya.sayMotivation(bot, message);
+        });
 }
 
 main();
